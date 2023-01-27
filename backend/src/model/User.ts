@@ -1,12 +1,12 @@
 import { SocialMedia } from './../schema/SocialMedia';
 import { UserName } from './../schema/UserName';
 import { Types } from "mongoose";
-import { prop } from '@typegoose/typegoose/lib/prop';
-import { getModelForClass, pre, modelOptions, Ref, ReturnModelType } from '@typegoose/typegoose';
+import { getModelForClass, pre, modelOptions, ReturnModelType, prop, Ref } from '@typegoose/typegoose';
 import bcrypt from "bcrypt";
 
 import { UserProfile } from '../types/interface';
 import { UserConfig } from '../schema/UserConfig';
+import { Post } from './Post';
 
 
 @pre<User>("save", function(next) {
@@ -40,6 +40,13 @@ class User {
 
     @prop({ default: [], type: [String] })
     public tokens!: Types.Array<string>;
+
+    // Post Management Properties
+    @prop({ default: [], type: () => String })
+    public posts!: Ref<Post, string>;
+    
+    @prop({ default: [], type: [String] })
+    public favoritedPosts!: Ref<Post, string>;
 
     // Profile Properties
     @prop()

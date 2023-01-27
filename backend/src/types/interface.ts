@@ -23,3 +23,8 @@ export interface User {
     username: string;
     email: string;
 }
+
+export interface RefreshToken {
+    idUser: string;
+    username: string;
+}
