@@ -3,7 +3,7 @@ import { modelOptions, prop } from "@typegoose/typegoose";
 @modelOptions({ schemaOptions: { _id: false } })
 export class SocialMedia {
     @prop()
-    public name?: string;
+    public name!: string;
     @prop()
-    public url?: string;
+    public url!: string;
 }

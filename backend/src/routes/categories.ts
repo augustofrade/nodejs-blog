@@ -7,7 +7,7 @@ router
     .route("/all")
     .get(CategoriesController.getAll);
 
-    router
+router
     .route("/create")
     .post(CategoriesController.createCategory);
 

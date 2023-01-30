@@ -1,11 +1,10 @@
-import { SocialMedia } from './../schema/SocialMedia';
-import { UserName } from './../schema/UserName';
 import { Types } from "mongoose";
-import { getModelForClass, pre, modelOptions, ReturnModelType, prop, Ref } from '@typegoose/typegoose';
+import { getModelForClass, pre, modelOptions, ReturnModelType, prop, Ref, DocumentType } from '@typegoose/typegoose';
 import bcrypt from "bcrypt";
 
-import { UserProfile } from '../types/interface';
 import { UserConfig } from '../schema/UserConfig';
+import { SocialMedia } from './../schema/SocialMedia';
+import { UserName } from './../schema/UserName';
 import { Post } from './Post';
 
 
@@ -27,26 +26,29 @@ import { Post } from './Post';
 class User {
     // Auth Properties
     @prop({ index: true, unique: true })
-    public username?: string;
+    public username!: string;
     
     @prop({ index: true, unique: true })
-    public email?: string;
+    public email!: string;
     
     @prop()
-    public password?: string;
+    public password!: string;
 
     @prop({ default: false })
-    public emailConfirmed?: boolean;
+    public emailConfirmed!: boolean;
 
+    /**
+     * Unused
+     */
     @prop({ default: [], type: [String] })
     public tokens!: Types.Array<string>;
 
     // Post Management Properties
     @prop({ default: [], type: () => String })
-    public posts!: Ref<Post, string>;
+    public posts!: Ref<Post, string>[];
     
-    @prop({ default: [], type: [String] })
-    public favoritedPosts!: Ref<Post, string>;
+    @prop({ default: [], type: String })
+    public favoritedPosts!: Ref<Post, string>[];
 
     // Profile Properties
     @prop()
@@ -74,16 +76,29 @@ class User {
     public configs?: UserConfig;
 
     @prop({ default: [], type: [SocialMedia] })
-    public socialMedia?: Types.Array<SocialMedia>;
+    public socialMedia!: Types.Array<SocialMedia>;
     
-    public static async getProfileByUsername(this: ReturnModelType<typeof User>, username: string): Promise<UserProfile | undefined> {
-        const user = await this.findOne({ username });
-        if(!user) return undefined;
+    public static async getFullProfileByUsername(this: ReturnModelType<typeof User>, username: string) {
+        const user = await this.findOne({ username }, "-password -tokens")
+            .populate("followers", "username name picture")
+            .populate("following", "username name picture")
+            .populate("posts", "_id slug title categories");
 
-        return {
-            email: <string>user.email,
-            username: <string>user.username            
-        };
+        return user;
+    }
+
+    public static async getProfileByUsername(this: ReturnModelType<typeof User>, username: string) {
+        const user = await this.findOne({ username }, "-password -emailConfirmed -tokens -favoritedPosts -configs")
+            .populate("followers", "username name picture")
+            .populate("following", "username name picture")
+            .populate("posts", "_id slug title categories");
+
+        return user;
+    }
+
+    public async verifyPassword(this: DocumentType<User>, password: string): Promise<boolean> {
+        const passwordMatch = bcrypt.compare(password, this.password);
+        return passwordMatch;
     }
 }
 

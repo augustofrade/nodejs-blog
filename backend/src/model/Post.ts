@@ -11,10 +11,10 @@ import generateSlug from '../utils/generateSlug';
 })
 class Post {
     @prop({ default: () => generatePostId() })
-    public _id?: string;
+    public _id!: string;
     
     @prop({ required: true })
-    public slug?: string;
+    public slug!: string;
 
     @prop({ required: true, type: () => User })
     public author!: Ref<User>;
