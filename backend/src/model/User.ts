@@ -6,6 +6,7 @@ import { UserConfig } from '../schema/UserConfig';
 import { SocialMedia } from './../schema/SocialMedia';
 import { UserName } from './../schema/UserName';
 import { Post } from './Post';
+import { Blog } from "./Blog";
 
 
 @pre<User>("save", function(next) {
@@ -44,11 +45,13 @@ class User {
     public tokens!: Types.Array<string>;
 
     // Post Management Properties
-    @prop({ default: [], type: () => String })
-    public posts!: Ref<Post, string>[];
     
     @prop({ default: [], type: String })
     public favoritedPosts!: Ref<Post, string>[];
+
+    // Blog Properties
+    @prop({ default: [], ref: () => Blog })
+    public blogs!: Ref<Blog>[];
 
     // Profile Properties
     @prop()
@@ -82,7 +85,7 @@ class User {
         const user = await this.findOne({ username }, "-password -tokens")
             .populate("followers", "username name picture")
             .populate("following", "username name picture")
-            .populate("posts", "_id slug title categories");
+            .populate("blogs", "_id slug name");
 
         return user;
     }
@@ -91,7 +94,7 @@ class User {
         const user = await this.findOne({ username }, "-password -emailConfirmed -tokens -favoritedPosts -configs")
             .populate("followers", "username name picture")
             .populate("following", "username name picture")
-            .populate("posts", "_id slug title categories");
+            .populate("blogs", "_id slug name");
 
         return user;
     }
@@ -102,6 +105,5 @@ class User {
     }
 }
 
-const UserModel = getModelForClass(User);
 
-export { UserModel, User };
+export { User };

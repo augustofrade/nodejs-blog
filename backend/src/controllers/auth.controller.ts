@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { User, UserModel } from "../model/User";
+import { User } from "../model/User";
+import { UserModel } from "../model/models";
 import { HTTPErrorResponse } from "../types/interface";
 import generateRefreshToken from "../utils/generateRefreshToken";
 

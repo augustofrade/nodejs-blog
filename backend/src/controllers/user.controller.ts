@@ -1,5 +1,6 @@
 import { HTTPErrorResponse, HTTPDefaultResponse } from './../types/interface';
-import { UserModel, User } from "../model/User";
+import { User } from "../model/User";
+import { UserModel } from "../model/models";
 import { Request, Response } from "express";
 
 export default abstract class UserController {
