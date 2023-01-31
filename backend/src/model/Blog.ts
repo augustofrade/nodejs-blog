@@ -9,7 +9,7 @@ import { BlogModel } from './models';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Blog {
-    @prop({ unique: true })
+    @prop({ unique: true, index: true })
     public slug!: string;
 
     @prop({ required: true })
@@ -34,7 +34,7 @@ class Blog {
     public config!: BlogConfig;
 
     static getDataBySlug(slug: string) {
-        return BlogModel.find({ slug })
+        return BlogModel.findOne({ slug })
             .populate("creator", "username name picture")
             .populate("collaborators", "username name picture")
             .populate("posts", "title slug _id author categories")

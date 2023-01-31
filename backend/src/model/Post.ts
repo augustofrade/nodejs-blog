@@ -5,6 +5,7 @@ import { User } from './User';
 import { Category } from './Category';
 import { Comment } from "../schema/Comment";
 import generateSlug from '../utils/generateSlug';
+import { Blog } from './Blog';
 
 @pre<Post>("save", function() {
     this.slug = generateSlug(this.title);
@@ -18,6 +19,9 @@ class Post {
 
     @prop({ required: true, type: () => User })
     public author!: Ref<User>;
+
+    @prop({ required: true, type: () => Blog })
+    public blog!: Ref<Blog>;
 
     @prop()
     public banner?: string;

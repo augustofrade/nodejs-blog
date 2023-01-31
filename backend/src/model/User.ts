@@ -99,7 +99,8 @@ class User {
         return user;
     }
 
-    public async verifyPassword(this: DocumentType<User>, password: string): Promise<boolean> {
+    public async verifyPassword(this: DocumentType<User>, password: string | undefined): Promise<boolean> {
+        if(!password) return new Promise<boolean>(resolve => resolve(false));
         const passwordMatch = bcrypt.compare(password, this.password);
         return passwordMatch;
     }
