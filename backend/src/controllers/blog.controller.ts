@@ -1,9 +1,7 @@
 import { HTTPErrorResponse, HTTPDefaultResponse } from './../types/interface';
-import { BlogModel, UserModel } from "../model/models";
+import { BlogModel, UserModel, PostModel } from "../model/models";
 import { Request, Response } from "express";
 import generateSlug from '../utils/generateSlug';
-import { PostModel } from '../model/Post';
-import { Types } from 'mongoose';
 
 export abstract class BlogController {
 
@@ -14,6 +12,7 @@ export abstract class BlogController {
 
         BlogModel.getDataBySlug(slug)
             .then(data => {
+                console.log(data?.populated("posts"));
                 if(!data)
                     res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Blog not found" });
                 else
@@ -70,8 +69,14 @@ export abstract class BlogController {
     }
 
     static async updateSlug(req: Request, res: Response) {
+        let newSlug: string | undefined = req.body.newSlug;
+        if(!newSlug)
+            return res.json(<HTTPErrorResponse>{ error: true, msg: "New blog access name not given" });
+        if(newSlug === req.body.slug)
+            return res.json({ msg: "New blog access name is the same as the actual name" });
+
         const blog = await BlogModel.findOne({ slug: req.body.slug });
-        const newSlug = generateSlug(req.body.newSlug);
+        newSlug = generateSlug(req.body.newSlug);
         blog!.slug = newSlug;
         blog!.save()
             .then(_ => res.status(200).json({ msg: `Slug updated successfuly to ${newSlug}` }))
@@ -98,7 +103,5 @@ export abstract class BlogController {
         } catch (err) {
             res.json(<HTTPErrorResponse>{ error: true, msg:"Blog deletion failed" })
         }
-        
-        
     }
 }

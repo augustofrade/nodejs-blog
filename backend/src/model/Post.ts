@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { prop, getModelForClass, pre, Ref } from "@typegoose/typegoose";
+import { prop, pre, Ref, ReturnModelType } from "@typegoose/typegoose";
 import generatePostId from "../utils/generatePostId";
 import { User } from './User';
 import { Category } from './Category';
@@ -14,13 +14,13 @@ class Post {
     @prop({ default: () => generatePostId() })
     public _id!: string;
     
-    @prop({ required: true })
+    @prop()
     public slug!: string;
 
-    @prop({ required: true, type: () => User })
+    @prop({ required: true, ref: () => User })
     public author!: Ref<User>;
 
-    @prop({ required: true, type: () => Blog })
+    @prop({ required: true, ref: () => Blog })
     public blog!: Ref<Blog>;
 
     @prop()
@@ -37,8 +37,12 @@ class Post {
 
     @prop({ required: true, type: [Category] })
     public categories!: Types.Array<Category>;
+
+    static findByBlogId(this: ReturnModelType<typeof Post>, id: string) {
+        return this.find({ blog: id }, "_id slug title author comments categories");
+    }
 }
 
-const PostModel = getModelForClass(Post);
 
-export { PostModel, Post };
+
+export { Post };

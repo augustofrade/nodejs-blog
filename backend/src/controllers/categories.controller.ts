@@ -3,7 +3,8 @@ import { CategoryModel, Category } from "../model/Category";
 
 abstract class CategoriesController {
     static async getAll(req: Request, res: Response): Promise<void> {
-        res.json({ msg: "All categories" });
+        const categories = await CategoryModel.find();
+        res.json(categories);
     }
 
     static async createCategory(req: Request, res: Response): Promise<void> {

@@ -1,4 +1,4 @@
-import { prop, Ref, modelOptions } from '@typegoose/typegoose';
+import { prop, Ref, modelOptions, DocumentType } from '@typegoose/typegoose';
 
 import { BlogConfig } from './../schema/BlogConfig';
 import { Post } from './Post';
@@ -24,8 +24,8 @@ class Blog {
     @prop({ required: true, ref: () => User })
     public creator!: Ref<User>;
 
-    @prop({ ref: () => User })
-    public collaborators?: Ref<User>[];
+    @prop({ default: [], ref: () => User })
+    public collaborators!: Ref<User>[];
 
     @prop({ required: true, default: {
         color: BlogColors.YELLOW,
@@ -38,6 +38,10 @@ class Blog {
             .populate("creator", "username name picture")
             .populate("collaborators", "username name picture")
             .populate("posts", "title slug _id author categories")
+    }
+
+    isUserAuthorized(this: DocumentType<Blog>, userId: string): boolean {
+        return this.creator._id == userId || this.collaborators?.filter(c => c._id == userId).length > 0;
     }
 }
 
