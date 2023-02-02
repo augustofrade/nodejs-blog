@@ -46,8 +46,8 @@ class User {
 
     // Post Management Properties
     
-    @prop({ default: [], type: String })
-    public favoritedPosts!: Ref<Post, string>[];
+    @prop({ default: [], ref: () => Post })
+    public favoritedPosts!: Ref<Post>[];
 
     // Blog Properties
     @prop({ default: [], ref: () => Blog })

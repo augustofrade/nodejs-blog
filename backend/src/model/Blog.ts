@@ -18,8 +18,8 @@ class Blog {
     @prop()
     public about?: string;
 
-    @prop({ required: true, default: [], type: () => String })
-    public posts!: Ref<Post, string>[];
+    @prop({ required: true, default: [], ref: () => Post })
+    public posts!: Ref<Post>[];
 
     @prop({ required: true, ref: () => User })
     public creator!: Ref<User>;
@@ -37,7 +37,7 @@ class Blog {
         return BlogModel.findOne({ slug })
             .populate("creator", "username name picture")
             .populate("collaborators", "username name picture")
-            .populate("posts", "title slug _id author categories")
+            .populate("posts", "title slug _publicId author categories")
     }
 
     isUserAuthorized(this: DocumentType<Blog>, userId: string): boolean {

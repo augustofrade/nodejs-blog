@@ -12,7 +12,6 @@ export abstract class BlogController {
 
         BlogModel.getDataBySlug(slug)
             .then(data => {
-                console.log(data?.populated("posts"));
                 if(!data)
                     res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Blog not found" });
                 else

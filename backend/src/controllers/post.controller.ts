@@ -25,15 +25,38 @@ abstract class PostsController {
     
         const isUserAuthorized = blog.isUserAuthorized(res.locals.userId);
         if(!isUserAuthorized)
-            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "User not authorized to make changes on this blog" });
+            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "User not authorized to create posts on this blog" });
 
         const newPost = new PostModel({ blog: blog._id, banner, title, content, categories, author: res.locals.userId });
         newPost.save()
             .then(async (data) => {
                 await BlogModel.findByIdAndUpdate(blog._id, { $push: { posts: data._id } });
-                res.status(200).json({ msg: "Article created successfuly", postId: `${data._id}` });
+                res.status(200).json({ msg: "Post created successfuly", postId: `${data._publicId}` });
             })
             .catch(err => res.status(500).json(err));
+    }
+    
+    static async update(req: Request, res: Response) {
+        // TODO: add update method
+        res.send("update");
+    }
+
+    static async delete(req: Request, res: Response) {
+        const { id } = req.body;
+        try {
+
+            const postData = await PostModel.findOneAndDelete({ _publicId: id }, { returnOriginal: true });
+            if(!postData)
+            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Post not found "});
+            
+            await BlogModel.findByIdAndUpdate(postData.blog, { $pull: { posts: postData._id } });
+            // TODO: remove also from User.favoritedPosts
+            
+            res.status(200).json({ msg: "Post deleted successfuly" });
+        } catch(error) {
+            res.json(error);
+        }
+
     }
 }
 

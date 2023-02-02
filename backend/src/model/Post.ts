@@ -12,7 +12,7 @@ import { Blog } from './Blog';
 })
 class Post {
     @prop({ default: () => generatePostId() })
-    public _id!: string;
+    public _publicId!: string;
     
     @prop()
     public slug!: string;
@@ -39,7 +39,7 @@ class Post {
     public categories!: Types.Array<Category>;
 
     static findByBlogId(this: ReturnModelType<typeof Post>, id: string) {
-        return this.find({ blog: id }, "_id slug title author comments categories");
+        return this.find({ blog: id }, "-_id _publicId slug title author comments categories");
     }
 }
 

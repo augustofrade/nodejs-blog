@@ -14,4 +14,13 @@ router
     .route("/create")
     .post(PostsController.create);
 
+
+router
+    .route("/update")
+    .post(PostsController.update);
+
+router
+    .route("/delete")
+    .post(PostsController.delete);
+
 export default router;
