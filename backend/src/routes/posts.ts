@@ -5,6 +5,10 @@ import PostsController from "../controllers/post.controller";
 const router = express.Router();
 
 router
+    .route("/get/:id")
+    .get(PostsController.getData);
+
+router
     .route("/blog/:slug")
     .get(PostsController.getFromBlog);
 

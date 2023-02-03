@@ -4,8 +4,8 @@ import generatePostId from "../utils/generatePostId";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 export class Comment {
-    @prop({ default: () => "generatePostId()" })
-    public _id?: string;
+    @prop({ default: () => generatePostId(), index: true })
+    public _publicId?: string;
 
     @prop({ ref: () => User, required: true })
     public user!: Ref<User>;

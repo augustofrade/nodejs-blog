@@ -1,10 +1,18 @@
-import { Types } from 'mongoose';
-import { BlogModel, PostModel, UserModel } from './../model/models';
+import { BlogModel, PostModel } from './../model/models';
 import { Request, Response } from "express";
 import { HTTPErrorResponse } from '../types/interface';
-// import { ABCModel } from '../model/a';
 
-abstract class PostsController {
+export default abstract class PostsController {
+    
+    static async getData(req: Request, res: Response) {
+        const { id } = req.params;
+        const post = await PostModel.findByPublicId(id);
+        if(!post)
+            res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Post not found" });
+        else
+            res.json(post);
+    }
+    
     static async getFromBlog(req: Request, res: Response) {
         const { slug } = req.params;
         const blog = await BlogModel.findOne({ slug });
@@ -37,8 +45,23 @@ abstract class PostsController {
     }
     
     static async update(req: Request, res: Response) {
-        // TODO: add update method
-        res.send("update");
+        const { id, title, content, banner, categories } = req.body;
+        const postToUpdate = await PostModel.findOne({ _publicId: id });
+        if(!postToUpdate)
+            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Post not found" });
+        if(postToUpdate.author != res.locals.userId)
+            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "User not authorized" });
+
+        try {
+            if(banner) postToUpdate.banner = banner;
+            postToUpdate.title = title;
+            postToUpdate.content = content;
+            postToUpdate.categories = categories;
+            postToUpdate.save();
+            res.status(200).json({ msg: "Post updated successfuly" });
+        } catch(error) {
+            res.status(404).json(error);
+        }
     }
 
     static async delete(req: Request, res: Response) {
@@ -59,5 +82,3 @@ abstract class PostsController {
 
     }
 }
-
-export default PostsController;

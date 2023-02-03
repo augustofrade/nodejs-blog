@@ -1,5 +1,4 @@
-import { HTTPErrorResponse, HTTPDefaultResponse } from './../types/interface';
-import { User } from "../model/User";
+import { HTTPErrorResponse } from './../types/interface';
 import { UserModel } from "../model/models";
 import { Request, Response } from "express";
 
@@ -10,8 +9,7 @@ export default abstract class UserController {
         let userProfile;
         
         if(res.locals.username == username) {
-            // TODO: get all user's own profile information
-            userProfile = await UserModel.getProfileByUsername(username);
+            userProfile = await UserModel.getFullProfileByUsername(username);
         } else {
             userProfile = await UserModel.getProfileByUsername(username);
         }

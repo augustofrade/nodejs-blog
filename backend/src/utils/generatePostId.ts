@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 
-const generatePostId = (): string => {
-    return nanoid(7);
+const generatePostId = (length: number = 7): string => {
+    return nanoid(length);
 }
 
 export default generatePostId;

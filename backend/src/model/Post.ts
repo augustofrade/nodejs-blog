@@ -41,6 +41,10 @@ class Post {
     static findByBlogId(this: ReturnModelType<typeof Post>, id: string) {
         return this.find({ blog: id }, "-_id _publicId slug title author comments categories");
     }
+
+    static findByPublicId(this: ReturnModelType<typeof Post>, publicId: string) {
+        return this.findOne({ _publicId: publicId }, "-_id _publicId slug title author comments categories");
+    }
 }
 
 
