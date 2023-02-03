@@ -16,6 +16,6 @@ router
 
 router
     .route("/upvote")
-    .get(CommentController.upvoteComment);
+    .post(CommentController.upvoteComment);
 
 export default router;

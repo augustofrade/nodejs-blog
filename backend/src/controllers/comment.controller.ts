@@ -34,6 +34,28 @@ export default abstract class CommentController {
     
     static async upvoteComment(req: Request, res: Response) {
         const { id } = req.body;
-        // TODO: upvote comment
+        const userId = res.locals.userId;
+        const post = await PostModel.findOne({ "comments._publicId": id });
+        if(!post)
+            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Failed to upvote the comment" });
+        let msg;
+        try {
+            post.comments!.forEach(comment => {
+                if(comment._publicId == id) {
+                    if(comment.upvotes.includes(userId)) {
+                        comment.upvotes = comment.upvotes.filter(u => u._id != userId);
+                        msg = "Comment upvoted";
+                    } else {
+                        comment.upvotes.push(userId);
+                        msg = "Upvote removed";
+                    }
+                }
+            })
+            post.save();
+            res.status(200).json({ msg });
+        } catch (error) {
+            res.json(<HTTPErrorResponse>{ error: true, msg: "Failed to upvote comment" });
+        }
+            
     }
 }
