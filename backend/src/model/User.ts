@@ -1,5 +1,6 @@
+import { generateEmailToken } from './../email/generateEmailToken';
 import { Types } from "mongoose";
-import { getModelForClass, pre, modelOptions, ReturnModelType, prop, Ref, DocumentType } from '@typegoose/typegoose';
+import { pre, modelOptions, ReturnModelType, prop, Ref, DocumentType } from '@typegoose/typegoose';
 import bcrypt from "bcrypt";
 
 import { UserConfig } from '../schema/UserConfig';
@@ -7,6 +8,7 @@ import { SocialMedia } from './../schema/SocialMedia';
 import { UserName } from './../schema/UserName';
 import { Post } from './Post';
 import { Blog } from "./Blog";
+import { EmailToken } from "../schema/EmailToken";
 
 
 @pre<User>("save", function(next) {
@@ -37,6 +39,12 @@ class User {
 
     @prop({ default: false })
     public emailConfirmed!: boolean;
+
+    @prop({ default: () => {
+        const { hash: _id, expiration } = generateEmailToken();
+        return { _id, expiration };
+    } })
+    public emailToken?: EmailToken;
 
     /**
      * Unused
@@ -80,6 +88,7 @@ class User {
 
     @prop({ default: [], type: [SocialMedia] })
     public socialMedia!: Types.Array<SocialMedia>;
+
     
     public static async getFullProfileByUsername(this: ReturnModelType<typeof User>, username: string) {
         const user = await this.findOne({ username }, "-password -tokens")

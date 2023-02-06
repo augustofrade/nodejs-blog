@@ -4,9 +4,10 @@ import { EmailSubject } from "../types/enum";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 export default class EmailTransport {
+    private static _instance: EmailTransport;
     private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
 
-    public constructor() {
+    private constructor() {
         this.transporter  = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 587,
@@ -25,6 +26,16 @@ export default class EmailTransport {
         });
     }
 
+    public sendConfirmationEmail(toEmail: string, token: string) {
+        const projectAddress = <string>process.env.ADDRESS;
+        const url = `${projectAddress}/email/${token}`;
+        return this.sendGenericEmail(toEmail, {
+            subject: EmailSubject.EmailCOnfirmation,
+            text: `Please confirm your e-mail by clicking on the following address: ${url}. Your token will expire in 5 minutes.`,
+            html: `Please confirm your e-mail by <a href=${url}>clicking here</a>. Your token will expire in <b>5 minutes</b>.`
+        });
+    }
+
     private sendGenericEmail(toEmail: string, email: EmailMessage): Promise<SMTPTransport.SentMessageInfo> {
         return this.transporter.sendMail({
             from: "\"blog\" <blog@gmail.com>",
@@ -33,5 +44,9 @@ export default class EmailTransport {
             text: email.text,
             html: email.html
         })
+    }
+
+    public static get Instance() {
+        return this._instance || (this._instance = new this());
     }
 }

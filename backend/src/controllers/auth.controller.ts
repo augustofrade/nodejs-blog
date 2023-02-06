@@ -12,7 +12,7 @@ export default abstract class AuthController {
         newUser.save()
             .then((user) => {
                 res.json({ msg: "User successfuly registered", data: user });
-                new EmailTransport().sendRegistrationEmail(user.email);
+                EmailTransport.Instance.sendRegistrationEmail(user.email);
             })
             .catch(err => {
                 res.json({ error: true, msg: err.message });

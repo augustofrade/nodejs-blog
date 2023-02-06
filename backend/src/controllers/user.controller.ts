@@ -27,10 +27,6 @@ export default abstract class UserController {
         res.json({ msg: "Profile Updated Successfuly" })
     }
 
-    static async confirmEmail(req: Request, res: Response) {
-        //TODO: confirm email
-    }
-
     static async followUser(req: Request, res: Response) {
         // TODO: follow/unfollow user logic
     }
