@@ -1,3 +1,5 @@
+import { EmailSubject } from "./enum";
+
 export interface User {
     id: string;
     username: string;
@@ -22,4 +24,10 @@ export interface HTTPErrorResponse {
 export interface HTTPDefaultResponse {
     msg?: string;
     data: unknown;
+}
+
+export interface EmailMessage {
+    subject: EmailSubject;
+    text: string;
+    html?: string;
 }

@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import { User } from "../model/User";
-import { UserModel } from "../model/models";
-import { HTTPErrorResponse } from "../types/interface";
-import generateRefreshToken from "../utils/generateRefreshToken";
+import { Request, Response } from 'express';
+import EmailTransport from '../email/EmailTransport';
+import { UserModel } from '../model/models';
+import { HTTPErrorResponse } from '../types/interface';
+import generateRefreshToken from '../utils/generateRefreshToken';
 
 export default abstract class AuthController {
 
@@ -12,6 +12,7 @@ export default abstract class AuthController {
         newUser.save()
             .then((user) => {
                 res.json({ msg: "User successfuly registered", data: user });
+                new EmailTransport().sendRegistrationEmail(user.email);
             })
             .catch(err => {
                 res.json({ error: true, msg: err.message });

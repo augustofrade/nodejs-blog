@@ -26,4 +26,12 @@ export default abstract class UserController {
         UserModel.findByIdAndUpdate(userId, { email, name, birth, picture, country, description, socialMedia });
         res.json({ msg: "Profile Updated Successfuly" })
     }
+
+    static async confirmEmail(req: Request, res: Response) {
+        //TODO: confirm email
+    }
+
+    static async followUser(req: Request, res: Response) {
+        // TODO: follow/unfollow user logic
+    }
 }

@@ -8,7 +8,6 @@ router
     .route("/profile/:username?")
     .get(UserController.getProfile);
 
-
 router.use(verifyToken);
 
 router
