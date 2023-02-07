@@ -1,11 +1,15 @@
 import nodemailer from "nodemailer";
-import { EmailMessage } from "../types/interface";
+import ejs from "ejs";
+import fs from "fs";
+import path from "path";
+import { EmailMessage, GenericToken } from "../types/interface";
 import { EmailSubject } from "../types/enum";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 export default class EmailTransport {
     private static _instance: EmailTransport;
     private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
+    private cachedTemplates: Record<string, string> = {};
 
     private constructor() {
         this.transporter  = nodemailer.createTransport({
@@ -17,22 +21,38 @@ export default class EmailTransport {
                 pass: <string>process.env.EMAIL_PASS
             }
         });
+
+        this.cacheTemplates();
     }
 
-    public sendRegistrationEmail(toEmail: string) {
+    private cacheTemplates() {
+        this.cachedTemplates.emailConfirmation = fs.readFileSync(path.join(__dirname, "./templates/emailConfirmation.ejs"), "utf-8");
+        this.cachedTemplates.accountRegistration = fs.readFileSync(path.join(__dirname, "./templates/accountRegistration.ejs"), "utf-8");
+    }
+
+    public sendRegistrationEmail(toEmail: string, username: string, token: GenericToken) {
+        const projectAddress = <string>process.env.ADDRESS;
+        const url = `${projectAddress}/email/${token.hash}`;
+
+        const renderedHTML = ejs.render(this.cachedTemplates.emailConfirmation, { url, username, expirationDate: token.expiration });
+
         return this.sendGenericEmail(toEmail, {
-            subject: EmailSubject.AccountRegistration,
-            text: "Your account on [BLOG] was successfully registered."
+            subject: EmailSubject.EmailCOnfirmation,
+            text: `${username}, welcome to urBlog! Please click on the following link to confirm your email: ${url}`,
+            html: renderedHTML
         });
     }
 
-    public sendConfirmationEmail(toEmail: string, token: string) {
+    public async sendConfirmationEmail(toEmail: string, token: GenericToken) {
         const projectAddress = <string>process.env.ADDRESS;
-        const url = `${projectAddress}/email/${token}`;
+        const url = `${projectAddress}/email/${token.hash}`;
+
+        const renderedHTML = ejs.render(this.cachedTemplates.emailConfirmation, { url, expirationDate: token.expiration });
+
         return this.sendGenericEmail(toEmail, {
             subject: EmailSubject.EmailCOnfirmation,
-            text: `Please confirm your e-mail by clicking on the following address: ${url}. Your token will expire in 5 minutes.`,
-            html: `Please confirm your e-mail by <a href=${url}>clicking here</a>. Your token will expire in <b>5 minutes</b>.`
+            text: `Please confirm your e-mail by clicking on the following address: ${url}. This link will expire in 5 minutes.`,
+            html: renderedHTML
         });
     }
 

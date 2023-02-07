@@ -31,3 +31,8 @@ export interface EmailMessage {
     text: string;
     html?: string;
 }
+
+export interface GenericToken {
+    hash: string;
+    expiration: Date;
+}

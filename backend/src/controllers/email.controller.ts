@@ -13,7 +13,7 @@ export default abstract class EmailController {
         const token = generateEmailToken();
         user.emailToken = { _id: token.hash, expiration: token.expiration };
         user.save();
-        EmailTransport.Instance.sendConfirmationEmail(user.email, token.hash);
+        EmailTransport.Instance.sendConfirmationEmail(user.email, token);
         res.json({ msg: "E-mail confirmation sent successfuly" });
     }
 

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import EmailTransport from '../email/EmailTransport';
+import { generateEmailToken } from '../email/generateEmailToken';
 import { UserModel } from '../model/models';
 import { HTTPErrorResponse } from '../types/interface';
 import generateRefreshToken from '../utils/generateRefreshToken';
@@ -8,11 +9,12 @@ export default abstract class AuthController {
 
     static async register(req: Request, res: Response) {
         const { email, username, password } = req.body;
-        const newUser = new UserModel({email, username, password });
+        const emailToken = generateEmailToken();
+        const newUser = new UserModel({email, username, password, emailToken });
         newUser.save()
             .then((user) => {
                 res.json({ msg: "User successfuly registered", data: user });
-                EmailTransport.Instance.sendRegistrationEmail(user.email);
+                EmailTransport.Instance.sendRegistrationEmail(user.email, username, emailToken);
             })
             .catch(err => {
                 res.json({ error: true, msg: err.message });
