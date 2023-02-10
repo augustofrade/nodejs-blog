@@ -18,7 +18,6 @@ router
     .route("/create")
     .post(PostsController.create);
 
-
 router
     .route("/update")
     .post(PostsController.update);
@@ -26,5 +25,9 @@ router
 router
     .route("/delete")
     .post(PostsController.delete);
+
+router
+    .route("/favorite")
+    .post(PostsController.favorite);
 
 export default router;

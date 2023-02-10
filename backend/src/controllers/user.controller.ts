@@ -28,6 +28,33 @@ export default abstract class UserController {
     }
 
     static async followUser(req: Request, res: Response) {
-        // TODO: follow/unfollow user logic
+        const { userId } = req.body;
+        const user = await UserModel.findById(res.locals.userId);
+        if(!user)
+        return res.status(400).json(<HTTPErrorResponse>{ error: true, msg: "Internal error" });
+
+        const userTarget = await UserModel.findById(userId);
+        if(!userTarget)
+            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "User not found" });
+        
+        let msg = "";
+        try {
+            if(user.following?.includes(userTarget._id)) {
+                user.following = user.following.filter(u => u._id != userTarget._id);
+                userTarget.followers = userTarget.followers?.filter(u => u._id != user._id);
+                msg = userTarget.username + " unfollowed";
+            }
+            else {
+                user.following?.push(userTarget._id);
+                userTarget.followers?.push(user._id);
+                msg = "Now following " + userTarget.username;
+            }
+            user.save();
+            userTarget.save();
+        } catch (err) {
+            msg = "Failed to follow " + userTarget.username;
+        }
+
+        res.json({ msg });
     }
 }

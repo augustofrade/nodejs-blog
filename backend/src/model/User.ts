@@ -77,10 +77,10 @@ class User {
     @prop()
     public description?: string;
 
-    @prop({ ref: () => User })
+    @prop({ default: [], ref: () => User })
     public following?: Ref<User>[];
 
-    @prop({ ref: () => User })
+    @prop({ default: [], ref: () => User })
     public followers?: Ref<User>[];
 
     @prop()

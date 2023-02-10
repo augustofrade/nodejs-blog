@@ -1,4 +1,4 @@
-import { BlogModel, PostModel } from './../model/models';
+import { BlogModel, PostModel, UserModel } from './../model/models';
 import { Request, Response } from "express";
 import { HTTPErrorResponse } from '../types/interface';
 
@@ -72,13 +72,44 @@ export default abstract class PostsController {
             if(!postData)
             return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Post not found "});
             
+            await UserModel.updateMany({ "favoritedPosts._id": postData._id }, { $pull: {
+                "favoritedPosts": { _id: postData._id }
+            }});
             await BlogModel.findByIdAndUpdate(postData.blog, { $pull: { posts: postData._id } });
-            // TODO: remove also from User.favoritedPosts
             
             res.status(200).json({ msg: "Post deleted successfuly" });
         } catch(error) {
             res.json(error);
         }
 
+    }
+
+    static async favorite(req: Request, res: Response) {
+        const { id } = req.body;
+        const user = await UserModel.findById(res.locals.userId);
+        if(!user)
+            return res.status(400).json(<HTTPErrorResponse>{ error: true, msg: "Internal error" });
+
+        const post = await PostModel.findOne({ _publicId: id });
+        if(!post)
+            return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Post not found" });
+        
+        let msg = "";
+        try {
+
+            if(user.favoritedPosts.includes(post._id)) {
+                user.favoritedPosts = user.favoritedPosts.filter(p => p._id != post._id);
+                msg = "Post removed from your favorites";
+            }
+            else {
+                user.favoritedPosts.push(post._id);
+                msg = "Post added to your favorites";
+            }
+            user.save();
+        } catch (err) {
+            msg = "Failed adding post to favorites";
+        }
+
+        res.json({ msg });
     }
 }
