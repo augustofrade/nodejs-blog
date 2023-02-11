@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account registered successfuly. Please confirm your e-mail address</title>
+    <title>Blog contribution invitation</title>
     <meta description="Confirm your e-mail address">
 
     <style>
@@ -18,12 +18,7 @@
     <table style="margin: 0 auto" width="600">
         <tr>
             <td>
-                <h2 class="text" style="margin-block-end: 0;">@<%= username %>, welcome to urBlog!</h2>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <h2 class="text">Let's confirm your e-mail address.</h2>
+                <h2 class="text">You've been invited to contribute to a blog.</h2>
             </td>
         </tr>
         <tr>
@@ -31,8 +26,12 @@
         </tr>
         <tr>
             <td>
-                <span class="text">Your account at urBlog was created successfuly.<br/>
-                    Please, click on the following link to confirm your e-mail address and access all the platform's features.</span>
+                <span>Hello, @<%= usernameSelf %>. You've been invited by @<%= usernameAuthor %> to contribute to their blog <%= blogName %> </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span>If you want to contribute to it, please click the link bellow to accept their invitation.</span>
             </td>
         </tr>
         <tr style="height: 100px;">
@@ -42,7 +41,7 @@
                     style="background-color: coral; color: #fff; font-size: 14px; text-decoration: none; padding: 10px; border-radius: 2px; margin-left: 30px"
                     href="<%= url %>"
                 >
-                    Confirm e-mail address
+                    Accept Invite
                 </a>
             </td>
         </tr>

@@ -28,6 +28,7 @@ export default class EmailTransport {
     private cacheTemplates() {
         this.cachedTemplates.emailConfirmation = fs.readFileSync(path.join(__dirname, "./templates/emailConfirmation.ejs"), "utf-8");
         this.cachedTemplates.accountRegistration = fs.readFileSync(path.join(__dirname, "./templates/accountRegistration.ejs"), "utf-8");
+        this.cachedTemplates.blogInvitation = fs.readFileSync(path.join(__dirname, "./templates/blogInvitation.ejs"), "utf-8");
     }
 
     public sendRegistrationEmail(toEmail: string, username: string, token: GenericToken) {
@@ -37,7 +38,7 @@ export default class EmailTransport {
         const renderedHTML = ejs.render(this.cachedTemplates.emailConfirmation, { url, username, expirationDate: token.expiration });
 
         return this.sendGenericEmail(toEmail, {
-            subject: EmailSubject.EmailCOnfirmation,
+            subject: EmailSubject.AccountRegistration,
             text: `${username}, welcome to urBlog! Please click on the following link to confirm your email: ${url}`,
             html: renderedHTML
         });
@@ -50,9 +51,22 @@ export default class EmailTransport {
         const renderedHTML = ejs.render(this.cachedTemplates.emailConfirmation, { url, expirationDate: token.expiration });
 
         return this.sendGenericEmail(toEmail, {
-            subject: EmailSubject.EmailCOnfirmation,
+            subject: EmailSubject.EmailConfirmation,
             text: `Please confirm your e-mail by clicking on the following address: ${url}. This link will expire in 5 minutes.`,
             html: renderedHTML
+        });
+    }
+
+    public async sendBlogInvitationEmail(toEmail: string, data: Record<string, string>, token: GenericToken) {
+        const projectAddress = <string>process.env.ADDRESS;
+        const url = `${projectAddress}/email/${token.hash}`;
+
+        const renderedHTML = ejs.render(this.cachedTemplates.blogInvitation, {
+            url,
+            expirationDate: token.expiration,
+            usernameSelf: data.self,
+            usernameAuthor: data.author,
+            blogName: data.blogName
         });
     }
 

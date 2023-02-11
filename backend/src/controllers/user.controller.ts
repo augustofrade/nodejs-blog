@@ -57,4 +57,6 @@ export default abstract class UserController {
 
         res.json({ msg });
     }
+
+    // TODO: delete account
 }

@@ -24,10 +24,21 @@ router
 
 router
     .route("/update-slug")
-    .post(BlogController.updateSlug)
+    .post(BlogController.updateSlug);
+    
+router
+    .route("/add-collaborator")
+    .post(BlogController.addCollaborator);
 
+router
+    .route("/remove-collaborator")
+    .post(BlogController.removeCollaborator);
+
+
+        
 router
     .route("/delete")
     .post(BlogController.delete);
+
 
 export default router;

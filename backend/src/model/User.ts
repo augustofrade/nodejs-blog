@@ -1,14 +1,14 @@
-import { generateEmailToken } from './../email/generateEmailToken';
+import { generateEmailToken } from "./../email/generateEmailToken";
 import { Types } from "mongoose";
-import { pre, modelOptions, ReturnModelType, prop, Ref, DocumentType } from '@typegoose/typegoose';
+import { pre, modelOptions, ReturnModelType, prop, Ref, DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
 
-import { UserConfig } from '../schema/UserConfig';
-import { SocialMedia } from './../schema/SocialMedia';
-import { UserName } from './../schema/UserName';
-import { Post } from './Post';
+import { UserConfig } from "../schema/UserConfig";
+import { SocialMedia } from "./../schema/SocialMedia";
+import { UserName } from "./../schema/UserName";
+import { Post } from "./Post";
 import { Blog } from "./Blog";
-import { EmailToken } from "../schema/EmailToken";
+import { Token } from "../schema/Token";
 
 
 @pre<User>("save", function(next) {
@@ -44,7 +44,7 @@ class User {
         const { hash: _id, expiration } = generateEmailToken();
         return { _id, expiration };
     } })
-    public emailToken?: EmailToken;
+    public emailToken?: Token;
 
     /**
      * Unused

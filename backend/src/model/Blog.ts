@@ -1,10 +1,14 @@
-import { prop, Ref, modelOptions, DocumentType } from '@typegoose/typegoose';
+import { generateGenericToken } from './../utils/generateGenericToken';
+import { DocumentType, modelOptions, prop, Ref } from '@typegoose/typegoose';
+import { Types } from 'mongoose';
 
+import { BlogColors, BlogFontFamilies } from '../types/enum';
 import { BlogConfig } from './../schema/BlogConfig';
+import { Collaborator } from './../schema/Collaborator';
+import { BlogModel } from './models';
 import { Post } from './Post';
 import { User } from './User';
-import { BlogColors, BlogFontFamilies } from '../types/enum';
-import { BlogModel } from './models';
+import EmailTransport from '../email/EmailTransport';
 
 
 @modelOptions({ schemaOptions: { timestamps: true } })
@@ -24,8 +28,8 @@ class Blog {
     @prop({ required: true, ref: () => User })
     public creator!: Ref<User>;
 
-    @prop({ default: [], ref: () => User })
-    public collaborators!: Ref<User>[];
+    @prop({ default: [], type: () => [Collaborator] })
+    public collaborators!: Types.Array<Collaborator>;
 
     @prop({ required: true, default: {
         color: BlogColors.YELLOW,
@@ -41,7 +45,7 @@ class Blog {
     }
 
     isUserAuthorized(this: DocumentType<Blog>, userId: string): boolean {
-        return this.creator._id == userId || this.collaborators?.filter(c => c._id == userId).length > 0;
+        return this.creator._id == userId || this.collaborators?.filter(c => c.user._id == userId && c.accepted).length > 0;
     }
 }
 

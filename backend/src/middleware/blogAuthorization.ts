@@ -19,6 +19,6 @@ export const blogAuthorization = async (req: Request, res: Response, next: NextF
     else if(!await user.verifyPassword(userPassword) || blog.creator._id != userId)
         return res.status(401).json(<HTTPErrorResponse>{ error: true, msg: "User not authorized" });
 
-    res.locals.user = user;
+    res.locals.blogId = blog._id;
     next();
 }

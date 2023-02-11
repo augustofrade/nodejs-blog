@@ -16,5 +16,5 @@ export enum EmailSubject {
     AccountRegistration = "Account Registration on Blog",
     FailedLoginAttempt = "Multiple failed login attempts",
     BlogCreation = "Your new blog has been created",
-    EmailCOnfirmation = "Please confirm your email"
+    EmailConfirmation = "Please confirm your email"
 }
