@@ -15,6 +15,10 @@ router
     .route("/create")
     .post(BlogController.create);
 
+router
+    .route("/join")
+    .post(BlogController.acceptInvitation);
+
 
 router.use(blogAuthorization);
 

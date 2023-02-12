@@ -12,4 +12,8 @@ router
     .route("/authenticate")
     .post(userAlreadyAuthenticated, AuthController.authenticate);
 
+router
+    .route("/logout")
+    .get(AuthController.logout);
+
 export default router;

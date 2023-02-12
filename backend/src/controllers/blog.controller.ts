@@ -25,6 +25,7 @@ export abstract class BlogController {
 
     }
 
+
     static async create(req: Request, res: Response) {
         const userId = res.locals.userId;
         if(!userId)
@@ -69,6 +70,7 @@ export abstract class BlogController {
             .catch(error => res.status(200).json({ error }));
     }
 
+
     static async updateSlug(req: Request, res: Response) {
         let newSlug: string | undefined = req.body.newSlug;
         if(!newSlug)
@@ -84,35 +86,39 @@ export abstract class BlogController {
             .catch(error => res.status(200).json({ error }));
     }
 
+
     static async addCollaborator(req: Request, res: Response) {
-        const { collaborator } = req.body;
+        const { username } = req.body;
 
         const blog = await BlogModel.findById(res.locals.blogId);
-        const userInvited = await UserModel.findById(collaborator);
+        const userInvited = await UserModel.findOne({ username });
         
         if(!userInvited)
             return res.json(<HTTPErrorResponse>{ error: true, msg: "User not found" });
-        
-        if(!blog)
-            return res.json(<HTTPErrorResponse>{ error: true, msg: "Blog not found" });
 
-        for (const collaborator of blog.collaborators) {
+        for (const collaborator of blog!.collaborators) {
             if(collaborator.user._id == userInvited._id)
                 return res.json({ msg:"User already invited" });
         }
 
         const userSelf = await UserModel.findById(res.locals.userId);
 
-        blog.collaborators.push({
-            user: userInvited._id
+        const token = generateGenericToken();
+        blog!.collaborators.push({
+            user: userInvited._id,
+            token: {
+                _id: token.hash,
+                expiration: token.expiration
+            }
         });
-        blog.save()
+
+        blog!.save()
             .then(_ => {
                 EmailTransport.Instance.sendBlogInvitationEmail(userInvited.email, {
                     self: userInvited.username,
                     author: userSelf!.username,
-                    blogName: blog.name
-                }, generateGenericToken());
+                    blogName: blog!.name
+                }, token);
                 res.json({ msg: "User successfully invited to contribute to the blog" });
             })
             .catch((error) => {
@@ -120,33 +126,29 @@ export abstract class BlogController {
             });
     }
 
+
     static async removeCollaborator(req: Request, res: Response) {
-        const { collaborator } = req.body;
+        const { username } = req.body;
 
         const blog = await BlogModel.findById(res.locals.blogId);
-        const userInvited = await UserModel.findById(collaborator);
+        const userInvited = await UserModel.findOne({ username });
         
         if(!userInvited)
             return res.json(<HTTPErrorResponse>{ error: true, msg: "User not found" });
-
-        for (const collaborator of blog!.collaborators) {
-            if(collaborator.user._id == userInvited._id) {
-                BlogModel.findOneAndUpdate({ _id: blog!._id }, { $pull: {
-                    "collaborators.user._id": userInvited._id
-                }})
-                    .then(_ => {
-                        res.json({ msg: "User successfully invited to contribute to the blog" });
-                    })
-                    .catch((error) => {
-                        res.json({ msg: "Failed to invite user" });
-                    });
-                return;
-            }
-
-            res.json(<HTTPErrorResponse>{ error: true, msg: "Can't remove a user that is not already invited or particpating on the blog" });
+        
+        try {
+            await BlogModel.findOneAndUpdate({ _id: blog!._id }, { $pull: {
+                "collaborators": { "user": userInvited._id }
+            }});
+            
+            res.json({ msg: `${userInvited.username} removed from the list of the blog's collaborators` });
+            
+        } catch (error) {
+            res.json({ msg: `Failed to remove ${userInvited.username}` });
         }
         
     }
+
 
     static async acceptInvitation(req: Request, res: Response) {
         const { token } = req.body;
@@ -162,6 +164,7 @@ export abstract class BlogController {
         
         res.status(200).json({ msg: "Blog invitation accepted successfully" });
     }
+
 
     static async delete(req: Request, res: Response) {
         const { slug } = req.body;
@@ -184,4 +187,5 @@ export abstract class BlogController {
             res.json(<HTTPErrorResponse>{ error: true, msg:"Blog deletion failed" })
         }
     }
+
 }

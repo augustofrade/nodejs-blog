@@ -1,7 +1,6 @@
 import { modelOptions, prop, Ref } from "@typegoose/typegoose";
 
 import { User } from "../model/User";
-import { generateGenericToken } from "../utils/generateGenericToken";
 import { Token } from "./Token";
 
 @modelOptions({ schemaOptions: { _id: false } })
@@ -16,6 +15,6 @@ export class Collaborator {
     @prop({ default: false  })
     public accepted!: boolean;
 
-    @prop({ default: () => generateGenericToken() })
+    @prop()
     public token?: Token;
 }

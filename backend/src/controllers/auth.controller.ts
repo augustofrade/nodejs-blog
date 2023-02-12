@@ -41,4 +41,10 @@ export default abstract class AuthController {
         res.cookie("token", newToken, { expires: expirationDate });
         res.json({ msg: "Authenticated successfuly" });
     }
+
+    static async logout(req: Request, res: Response) {
+        // TODO: after refresh token is stored in user schema, remove it here too
+        res.clearCookie("token");
+        res.json({ msg: "User logged out" });
+    }
 }
