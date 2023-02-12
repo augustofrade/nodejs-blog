@@ -59,7 +59,7 @@ export default class EmailTransport {
 
     public async sendBlogInvitationEmail(toEmail: string, data: Record<string, string>, token: GenericToken) {
         const projectAddress = <string>process.env.ADDRESS;
-        const url = `${projectAddress}/email/${token.hash}`;
+        const url = `${projectAddress}/invite/${token.hash}`;
 
         const renderedHTML = ejs.render(this.cachedTemplates.blogInvitation, {
             url,
@@ -67,6 +67,12 @@ export default class EmailTransport {
             usernameSelf: data.self,
             usernameAuthor: data.author,
             blogName: data.blogName
+        });
+
+        return this.sendGenericEmail(toEmail, {
+            subject: EmailSubject.BlogInvitation,
+            text: `Please click on the following link if you would like to contribute on the blog ${data.blogName}: ${url}. This link will expire in 5 minutes.`,
+            html: renderedHTML
         });
     }
 

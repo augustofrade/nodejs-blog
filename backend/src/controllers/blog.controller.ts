@@ -148,6 +148,21 @@ export abstract class BlogController {
         
     }
 
+    static async acceptInvitation(req: Request, res: Response) {
+        const { token } = req.body;
+        if(!token)
+            return res.json(<HTTPErrorResponse>{ error: true, msg: "Invalid blog invitation token" });
+        
+        const blog = await BlogModel.findOneAndUpdate({ "collaborators.token._id": token }, { $set: {
+            "collaborators.$": { token: undefined, accepted: true }
+        } }, { returnOriginal: true });
+
+        if(!blog)
+            return res.json(<HTTPErrorResponse>{ error: true, msg: "Invalid blog invitation token" });
+        
+        res.status(200).json({ msg: "Blog invitation accepted successfully" });
+    }
+
     static async delete(req: Request, res: Response) {
         const { slug } = req.body;
 
