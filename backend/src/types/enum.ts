@@ -13,7 +13,7 @@ export enum BlogFontFamilies {
 }
 
 export enum EmailSubject {
-    AccountRegistration = "Account Registration on Blog",
+    AccountRegistration = "Account Registration on urBlog",
     EmailConfirmation = "Please confirm your email",
     FailedLoginAttempt = "Multiple failed login attempts",
     BlogCreation = "Your new blog has been created",

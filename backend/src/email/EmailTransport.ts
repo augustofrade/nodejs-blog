@@ -71,14 +71,14 @@ export default class EmailTransport {
 
         return this.sendGenericEmail(toEmail, {
             subject: EmailSubject.BlogInvitation,
-            text: `Please click on the following link if you would like to contribute on the blog ${data.blogName}: ${url}. This link will expire in 5 minutes.`,
+            text: `Please click on the following link if you would like to contribute on ${data.author}'s ${data.blogName}: ${url}. This link will expire in 5 minutes.`,
             html: renderedHTML
         });
     }
 
     private sendGenericEmail(toEmail: string, email: EmailMessage): Promise<SMTPTransport.SentMessageInfo> {
         return this.transporter.sendMail({
-            from: "\"blog\" <blog@gmail.com>",
+            from: "\"urBlog\" <urblog@gmail.com>",
             to: toEmail,
             subject: email.subject,
             text: email.text,
