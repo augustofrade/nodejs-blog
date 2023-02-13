@@ -10,7 +10,7 @@ export class Comment {
     @prop({ ref: () => User, required: true })
     public user!: Ref<User>;
 
-    @prop({ required: true })
+    @prop({ required: true, minLength: 4, maxLength: 200 })
     public content!: string;
 
     @prop({ default: [], ref: () => User })

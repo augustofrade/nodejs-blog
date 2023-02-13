@@ -31,10 +31,10 @@ class User {
     @prop({ index: true, unique: true })
     public username!: string;
     
-    @prop({ index: true, unique: true })
+    @prop({ index: true, unique: true, minlength: 10, maxLength: 100 })
     public email!: string;
     
-    @prop()
+    @prop({ minLength: 6 })
     public password!: string;
 
     @prop({ default: false })
@@ -71,10 +71,10 @@ class User {
     @prop()
     public picture?: string;
 
-    @prop()
+    @prop({ minLength: 4, maxlength: 40 })
     public country?: string;
 
-    @prop()
+    @prop({ maxLength: 100 })
     public description?: string;
 
     @prop({ default: [], ref: () => User })

@@ -2,8 +2,8 @@ import { modelOptions, prop } from "@typegoose/typegoose";
 
 @modelOptions({ schemaOptions: { _id: false } })
 export class SocialMedia {
-    @prop()
+    @prop({ minlength: 3, maxLength: 15 })
     public name!: string;
-    @prop()
+    @prop({ minLength: 10, maxLength: 50 })
     public url!: string;
 }

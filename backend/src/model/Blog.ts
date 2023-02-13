@@ -16,10 +16,10 @@ class Blog {
     @prop({ unique: true, index: true })
     public slug!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, minlength: 8, maxLength: 30 })
     public name!: string;
 
-    @prop()
+    @prop({ maxLength: 200 })
     public about?: string;
 
     @prop({ required: true, default: [], ref: () => Post })
