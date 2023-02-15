@@ -13,7 +13,7 @@ import EmailTransport from '../email/EmailTransport';
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Blog {
-    @prop({ unique: true, index: true })
+    @prop({ unique: true, index: true, minLength: 4, maxLength: 20 })
     public slug!: string;
 
     @prop({ required: true, minlength: 8, maxLength: 30 })

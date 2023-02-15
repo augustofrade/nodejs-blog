@@ -67,7 +67,6 @@ export default abstract class PostsController {
     static async delete(req: Request, res: Response) {
         const { id } = req.body;
         try {
-
             const postData = await PostModel.findOneAndDelete({ _publicId: id }, { returnOriginal: true });
             if(!postData)
             return res.status(404).json(<HTTPErrorResponse>{ error: true, msg: "Post not found "});

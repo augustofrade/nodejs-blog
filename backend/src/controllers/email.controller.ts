@@ -8,7 +8,7 @@ export default abstract class EmailController {
     static async newEmailToken(req: Request, res: Response) {
         const user = await UserModel.findById(res.locals.userId);
         if(!user || user.emailConfirmed)
-            return res.json({ msg: "Email already confirmed" });
+            return res.json({ msg: "User not found or e-mail already confirmed" });
         
         const token = generateEmailToken();
         user.emailToken = { _id: token.hash, expiration: token.expiration };
@@ -18,9 +18,6 @@ export default abstract class EmailController {
     }
 
     static async verifyEmailToken(req: Request, res: Response) {
-        if(!req.body.token)
-            return res.json({ error: true, msg: "E-mail confirmation token not provided" });
-        
         const user = await UserModel.findOne({ "emailToken._id": req.body.token });
         if(!user)
             return res.json({ error: true, msg: "Invalid e-mail confirmation token" });

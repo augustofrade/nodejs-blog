@@ -26,10 +26,10 @@ class Post {
     @prop()
     public banner?: string;
 
-    @prop({ required: true, minLength: 10, maxLength: 40 })
+    @prop({ required: true, minLength: 10, maxLength: 50 })
     public title!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, minlength: 10 })
     public content!: string;
 
     @prop({ default: [], type: [Comment] })

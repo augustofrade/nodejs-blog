@@ -26,23 +26,25 @@ export abstract class BlogController {
     }
 
 
+    static async search(req: Request, res: Response) {
+        // TODO: create search method
+    }
+
+
     static async create(req: Request, res: Response) {
         const userId = res.locals.userId;
         if(!userId)
             return res.status(400).json(<HTTPErrorResponse>{ error: true, msg: "Internal Error" });
     
-        const { name, config } = req.body;
-        const slug: string | undefined = req.body.slug ? generateSlug(req.body.slug) : undefined; // enforce slug format
+        const { name, config, about } = req.body;
+        const slug: string = generateSlug(name);
 
-        if(!slug)
-            return res.status(400).json(<HTTPErrorResponse>{ error: true, msg: "Invalid blog access name" });
-        
         const slugInUse = !!await BlogModel.findOne({ slug });
 
         if(slugInUse)
             return res.json(<HTTPErrorResponse>{ error: true, msg: "Blog access name already in use" });
         
-        const newBlog = new BlogModel({ name, config, slug, creator: userId });
+        const newBlog = new BlogModel({ name, about, config, slug, creator: userId });
         newBlog.save()
             .then(async (blogData) => {
                 UserModel.findById(userId).then(user => {
@@ -72,13 +74,13 @@ export abstract class BlogController {
 
 
     static async updateSlug(req: Request, res: Response) {
-        let newSlug: string | undefined = req.body.newSlug;
-        if(!newSlug)
-            return res.json(<HTTPErrorResponse>{ error: true, msg: "New blog access name not given" });
-        if(newSlug === req.body.slug)
-            return res.json({ msg: "New blog access name is the same as the actual name" });
+        let newSlug: string = req.body.newSlug;
+        const currentSlug: string = req.body.slug;
 
-        const blog = await BlogModel.findOne({ slug: req.body.slug });
+        if(newSlug === currentSlug)
+            return res.json({ msg: "New blog access name is the same as the actual one" });
+
+        const blog = await BlogModel.findOne({ slug: currentSlug });
         newSlug = generateSlug(req.body.newSlug);
         blog!.slug = newSlug;
         blog!.save()
@@ -151,10 +153,8 @@ export abstract class BlogController {
 
 
     static async acceptInvitation(req: Request, res: Response) {
-        const { token } = req.body;
-        if(!token)
-            return res.json(<HTTPErrorResponse>{ error: true, msg: "Invalid blog invitation token" });
-        
+        const token: string = req.body.token;
+
         const blog = await BlogModel.findOneAndUpdate({ "collaborators.token._id": token }, { $set: {
             "collaborators.$": { token: undefined, accepted: true }
         } }, { returnOriginal: true });

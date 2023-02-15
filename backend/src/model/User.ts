@@ -28,7 +28,7 @@ import { Token } from "../schema/Token";
 @modelOptions({ schemaOptions: { timestamps: true } })
 class User {
     // Auth Properties
-    @prop({ index: true, unique: true })
+    @prop({ index: true, unique: true, minLength: 5, maxLength: 30 })
     public username!: string;
     
     @prop({ index: true, unique: true, minlength: 10, maxLength: 100 })
